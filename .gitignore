@@ -151,6 +151,8 @@ dmypy.json
 
 # Cython debug symbols
 cython_debug/
+src/assets/authorization.py
+
 
 # PyCharm
 #  JetBrains specific template is maintained in a separate JetBrains.gitignore that can
@@ -159,4 +161,3 @@ cython_debug/
 #  option (not recommended) you can uncomment the following to ignore the entire idea folder.
 #.idea/
 
-src/assets/authorization.py
