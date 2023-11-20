@@ -151,7 +151,7 @@ dmypy.json
 
 # Cython debug symbols
 cython_debug/
-src/assets/authorization.py
+src\assets\authorization.py
 
 
 # PyCharm
