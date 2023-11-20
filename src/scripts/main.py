@@ -1,4 +1,9 @@
-from ..assets.authorization import AUTH_TOKEN
+import os
+from dotenv import load_dotenv
 
-def test():
-    print(AUTH_TOKEN)
+load_dotenv()
+
+client_id = os.getenv("CLIENT_ID")
+client_secret = os.getenv("CLIENT_SECRET")
+
+print(client_id,client_secret)
