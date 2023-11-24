@@ -61,21 +61,23 @@ def get_songs_from_playlist(json_playlist):
     return songs
 
 def get_difference(playlist1,playlist2):
-    common_titles = set(playlist1.keys()) & set(playlist2.keys())
+    common_titles = set(item1['title'] for item1 in playlist1.values()) & set(item2['title'] for item2 in playlist2.values())
+    dict1 = {key: value for key, value in playlist1.items() if value['title'] not in common_titles}
+    return dict1
 
-    for title in common_titles:
-        del playlist1[title]
-    
-    return playlist1
+def add_to_playlist(token,playlist_to_add,URI_songs_to_add):
+    return
 
 token = get_token()
-json_first_playlist = get_playlist_by_id(token,"0tG8lWSuqMaZhJ1HkUyhCo")
+json_first_playlist = get_playlist_by_id(token,"46Vvp6M1HPCbNg1W9kcCRZ")
 json_second_playlist = get_playlist_by_id(token,"0CtD0CLuF8cXpLAN1H07jO")
 first_playlist_songs = get_songs_from_playlist(json_first_playlist)
 second_playlist_songs = get_songs_from_playlist(json_second_playlist)
 
 different_songs = get_difference(first_playlist_songs,second_playlist_songs)
-print(different_songs)
+print(different_songs.keys())
+
+
 # f = open("demofile3.txt", "w")
 # f.write(json.dumps(json_results,indent=4))
 # f.close()
