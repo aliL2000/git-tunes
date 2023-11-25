@@ -1,72 +1,10 @@
-import os
-from dotenv import load_dotenv
-import base64
-from requests import post, get
-import json
-
-load_dotenv()
-client_id = os.getenv("CLIENT_ID")
-client_secret = os.getenv("CLIENT_SECRET")
+import PySimpleGUI as sg
+from authorization.spotify_auth import get_token
+from spotify_api.playlist_data import get_playlist_by_id, get_songs_from_playlist, get_differences
 
 
-def get_token():
-    auth_string = client_id + ":" + client_secret
-    auth_bytes = auth_string.encode("utf-8")
-    auth_base64 = str(base64.b64encode(auth_bytes), "utf-8")
-    url = "https://accounts.spotify.com/api/token"
-
-    headers = {
-        "Authorization": "Basic " + auth_base64,
-        "Content-Type": "application/x-www-form-urlencoded",
-    }
-    data = {"grant_type": "client_credentials"}
-    result = post(url, headers=headers, data=data)
-    json_result = json.loads(result.content)
-    token = json_result["access_token"]
-    return token
 
 
-def get_auth_header(token):
-    return {"Authorization": "Bearer " + token}
-
-
-def get_playlist_by_id(token, playlist_id):
-    url = f"https://api.spotify.com/v1/playlists/{playlist_id}"
-    headers = get_auth_header(token)
-
-    result = get(url, headers=headers)
-    json_result = json.loads(result.content)
-    return json_result
-
-def get_songs_from_playlist(json_playlist):
-    songs = {}
-    counter = 1
-    for song in json_playlist["tracks"]["items"]:
-        song_key = "song"+str(counter)
-        song_name = song["track"]["name"]
-        song_URI = song["track"]["uri"]
-        artists = []
-        for artist in song["track"]["artists"]:
-            artists.append(artist["name"])
-        songs.update(
-            {
-                song_key: {
-                    "title": song_name,
-                    "artist": artists,
-                    "URI": song_URI,
-                }
-            }
-        )
-        counter+=1
-    return songs
-
-def get_difference(playlist1,playlist2):
-    common_titles = set(item1['title'] for item1 in playlist1.values()) & set(item2['title'] for item2 in playlist2.values())
-    dict1 = {key: value for key, value in playlist1.items() if value['title'] not in common_titles}
-    return dict1
-
-def add_to_playlist(token,playlist_to_add,URI_songs_to_add):
-    return
 
 token = get_token()
 json_first_playlist = get_playlist_by_id(token,"46Vvp6M1HPCbNg1W9kcCRZ")
@@ -74,9 +12,27 @@ json_second_playlist = get_playlist_by_id(token,"0CtD0CLuF8cXpLAN1H07jO")
 first_playlist_songs = get_songs_from_playlist(json_first_playlist)
 second_playlist_songs = get_songs_from_playlist(json_second_playlist)
 
-different_songs = get_difference(first_playlist_songs,second_playlist_songs)
+different_songs = get_differences(first_playlist_songs,second_playlist_songs)
 print(different_songs.keys())
 
+
+
+# layout = [[sg.Text("Hello from PySimpleGUI")], [sg.Button("OK")]]
+
+
+
+# # Create the window
+# window = sg.Window("Git-Tunes", layout)
+
+# # Create an event loop
+# while True:
+#     event, values = window.read()
+#     # End program if user closes window or
+#     # presses the OK button
+#     if event == "OK" or event == sg.WIN_CLOSED:
+#         break
+
+# window.close()
 
 # f = open("demofile3.txt", "w")
 # f.write(json.dumps(json_results,indent=4))
