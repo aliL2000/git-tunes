@@ -7,8 +7,8 @@ import json
 
 token = get_token(get_auth_code())
 
-json_first_playlist = get_playlist_by_id(token,"46Vvp6M1HPCbNg1W9kcCRZ")
-json_second_playlist = get_playlist_by_id(token,"0CtD0CLuF8cXpLAN1H07jO")
+json_first_playlist = get_playlist_by_id(token,"https://open.spotify.com/playlist/0tG8lWSuqMaZhJ1HkUyhCo?si=8bf6f26f84d6426a")
+json_second_playlist = get_playlist_by_id(token,"https://open.spotify.com/playlist/0CtD0CLuF8cXpLAN1H07jO?si=323512ab01b44220")
 first_playlist_songs = get_songs_from_playlist(json_first_playlist)
 second_playlist_songs = get_songs_from_playlist(json_second_playlist)
 

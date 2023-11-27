@@ -1,8 +1,13 @@
 from authorization.spotify_auth import get_auth_header, get_token
 from requests import post, get
 import json
+import re
 
-def get_playlist_by_id(token, playlist_id):
+def get_playlist_by_id(token, playlist):
+    match = re.search(r'playlist/([^?]+)', playlist)
+    playlist_id = ""
+    if match:
+        playlist_id = match.group(1)
     url = f"https://api.spotify.com/v1/playlists/{playlist_id}"
     headers = get_auth_header(token)
 
