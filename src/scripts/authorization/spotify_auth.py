@@ -75,9 +75,15 @@ def get_new_token(auth_code):
     }
     result = post(token_url, data=token_params, headers=token_headers)
     token_data = json.loads(result.content)
-    token = token_data["access_token"]
-    ##TODO:print(token_data), and set the 
-    return token
+    if result.status_code == 200:
+        refresh_token = token_data["refresh_token"]
+        with open("src/assets/tokens.txt", 'r+') as file:
+            file.seek(0)
+            file.write(f"refresh_token={refresh_token}\n")
+        return token_data["access_token"]
+    else:
+        print("ruh roh")
+        exit()
 
 
 def get_auth_header(token):
