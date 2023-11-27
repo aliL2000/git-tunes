@@ -14,29 +14,29 @@ redirect_url = "https://localhost/"
 
 
 def get_refresh_token():
-    # TODO:
-    # Check text for refresh-token=, and attempt the API call with that token
-    # If successful,
+    token_url = "https://accounts.spotify.com/api/token"
     lines = []
     with open("src/assets/tokens.txt") as my_file:
         for line in my_file:
             lines.append(line)
     refresh_token = lines[0].split("=")[1].replace("\n", "")
     auth_code = lines[1].split("=")[1].replace("\n", "")
-
-
-# credentials
-# user = 'username'
-# desired_scope = 'playlist-modify-private'
-# id = os.environ.get('SPOT_CLIENT')
-# secret = os.environ.get('SPOT_SECRET')
-# uri = 'https://localhost'
-# token = util.prompt_for_user_token(username=user,
-#                                    scope=desired_scope,
-#                                    client_id=id,
-#                                    client_secret=secret,
-#                                    redirect_uri=uri)
-
+    #
+    token_headers = {
+        "Authorization": "Basic " + get_auth_encoded_string(),
+        "Content-Type": "application/x-www-form-urlencoded"
+    }
+    body = {
+        "grant_type": "refresh_token",
+        "refresh_token": refresh_token,
+        "redirect_uri": redirect_url,
+    }
+    result = post(token_url, data=body, headers=token_headers)
+    token_data = json.loads(result.content)
+    if result.status_code == 200:
+        return token_data["access_token"]
+    else:
+        return get_new_token(get_auth_code())
 
 def get_auth_code():
     given_state = "".join(random.choice(string.ascii_letters) for i in range(16))
@@ -62,24 +62,28 @@ def get_auth_code():
     return auth_code
 
 
-def get_token(auth_code):
+def get_new_token(auth_code):
     token_url = "https://accounts.spotify.com/api/token"
-    auth_string = client_id + ":" + client_secret
-    auth_bytes = auth_string.encode("utf-8")
-    auth_base64 = str(base64.b64encode(auth_bytes), "utf-8")
     token_params = {
         "code": auth_code,
         "redirect_uri": redirect_url,
         "grant_type": "authorization_code",
     }
     token_headers = {
-        "Authorization": "Basic " + auth_base64,
+        "Authorization": "Basic " + get_auth_encoded_string(),
+        "Content-Type": "application/x-www-form-urlencoded"
     }
     result = post(token_url, data=token_params, headers=token_headers)
     token_data = json.loads(result.content)
     token = token_data["access_token"]
+    ##TODO:print(token_data), and set the 
     return token
 
 
 def get_auth_header(token):
     return {"Authorization": "Bearer " + token}
+
+def get_auth_encoded_string():
+    auth_string = client_id + ":" + client_secret
+    auth_bytes = auth_string.encode("utf-8")
+    return str(base64.b64encode(auth_bytes), "utf-8")

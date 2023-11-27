@@ -1,4 +1,4 @@
-from authorization.spotify_auth import get_auth_header, get_token
+from authorization.spotify_auth import get_auth_header, get_new_token
 from requests import post, get
 import json
 import re
@@ -52,7 +52,7 @@ def add_to_playlist(token,playlist_ID_to_add_to,picked_songs_dictionary):
     url = f"https://api.spotify.com/v1/playlists/{playlist_ID_to_add_to}/tracks"
     
     headers = {
-        'Authorization': 'Bearer ' + token,
+        "Authorization": "Bearer " + token,
         "Content-Type": "application/json",
     }
     data = {"uris":URI_of_songs_to_add}
