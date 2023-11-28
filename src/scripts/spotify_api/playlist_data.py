@@ -13,7 +13,12 @@ def get_playlist_by_id(token, playlist):
 
     result = get(url, headers=headers)
     json_result = json.loads(result.content)
-    return json_result
+    if result.status_code == 200:
+        return json_result
+    elif result.status_code == 404:
+        return {"error":"Not found Playlist"}
+    else:
+        return {}
 
 def get_songs_from_playlist(json_playlist):
     songs = {}
