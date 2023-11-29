@@ -8,19 +8,32 @@ from spotify_api.playlist_data import (
 
 import os
 import json
-from PyQt6.QtWidgets import QVBoxLayout, QListWidget, QListWidgetItem,QApplication, QLabel, QWidget, QGridLayout, QPushButton, QLineEdit, QCheckBox
+from PyQt6.QtWidgets import (
+    QVBoxLayout,
+    QListWidget,
+    QListWidgetItem,
+    QApplication,
+    QLabel,
+    QWidget,
+    QGridLayout,
+    QPushButton,
+    QLineEdit,
+    QCheckBox,
+)
 from PyQt6 import QtCore
 import sys
 
 # This will check if a refresh token exists, and if it doesn't or there's an error, it'll get a new code.
-token = get_refresh_token()
-print("hellooooo")
+# token = get_refresh_token()
+# print("hellooooo")
 # json_first_playlist = get_playlist_by_id(token,"https://open.spotify.com/playlist/0tG8lWSuqMaZhJ1HkUyhCo?si=8bf6f26f84d6426a")
 # json_second_playlist = get_playlist_by_id(token,"https://open.spotify.com/playlist/0CtD0CLuF8cXpLAN1H07jO?si=323512ab01b44220")
 # first_playlist_songs = get_songs_from_playlist(json_first_playlist)
 # second_playlist_songs = get_songs_from_playlist(json_second_playlist)
 
 # different_songs = get_differences(first_playlist_songs,second_playlist_songs)
+
+# print(different_songs)
 
 # test = json.dumps(different_songs)
 # different_songs["song1"]["picked"] = True
@@ -65,18 +78,15 @@ print("hellooooo")
 #         json_first_playlist = get_playlist_by_id(token,playlist_to_copy_URL)
 #         json_second_playlist = get_playlist_by_id(token,playlist_to_be_copied_URL)
 
-#         if 
+#         if
 
 
-
-    
-
-        
 # if __name__ == '__main__':
 #     app = QApplication(sys.argv)
 #     form = MyForm()
 #     form.show()
 #     sys.exit(app.exec())
+
 
 class SongApp(QWidget):
     def __init__(self):
@@ -84,10 +94,60 @@ class SongApp(QWidget):
 
         # Sample dictionary of songs
         self.songs = {
-            'Song1': 'Artist1',
-            'Song2': 'Artist2',
-            'Song3': 'Artist3',
-            'Song4': 'Artist4',
+            "song1": {
+                "title": "End of Line",
+                "artist": ["Daft Punk"],
+                "URI": "spotify:track:09TlxralXOGX35LUutvw7I",
+                "picked": False,
+            },
+            "song2": {
+                "title": "Una Mattina",
+                "artist": ["Ludovico Einaudi"],
+                "URI": "spotify:track:0Dkibk70FDp6t7eOZNemNQ",
+                "picked": False,
+            },
+            "song3": {
+                "title": "TURN IT UP",
+                "artist": ["Cochise"],
+                "URI": "spotify:track:0uUljDsi9o1MXjReM6uLzz",
+                "picked": False,
+            },
+            "song4": {
+                "title": "Can You Hear The Music",
+                "artist": ["Ludwig Göransson"],
+                "URI": "spotify:track:4VnDmjYCZkyeqeb0NIKqdA",
+                "picked": False,
+            },
+            "song5": {
+                "title": "Luminary",
+                "artist": ["Joel Sunny"],
+                "URI": "spotify:track:66pWxtaxTV8CxcGOvivZeT",
+                "picked": False,
+            },
+            "song6": {
+                "title": "The Streak",
+                "artist": ["Mychael Danna"],
+                "URI": "spotify:track:0vNY5T9ovcOxqA8B6QOATk",
+                "picked": False,
+            },
+            "song7": {
+                "title": "Like a Tattoo",
+                "artist": ["Sade"],
+                "URI": "spotify:track:4PEGwWH4tL6H7dGl4uVSPg",
+                "picked": False,
+            },
+            "song8": {
+                "title": "King of Curses, Fire Arrow",
+                "artist": ["James Liam Figueroa"],
+                "URI": "spotify:track:5Mm6Nr9uzhQVOnsw0HDQqH",
+                "picked": False,
+            },
+            "song9": {
+                "title": "Cornfield Chase",
+                "artist": ["Hans Zimmer"],
+                "URI": "spotify:track:6pWgRkpqVfxnj3WuIcJ7WP",
+                "picked": False,
+            },
         }
 
         self.initUI()
@@ -101,7 +161,7 @@ class SongApp(QWidget):
         layout.addWidget(self.song_list_widget)
 
         # Create submit button
-        submit_button = QPushButton('Submit', self)
+        submit_button = QPushButton("Submit", self)
         submit_button.clicked.connect(self.on_submit)
         layout.addWidget(submit_button)
 
@@ -110,17 +170,19 @@ class SongApp(QWidget):
 
         # Set window properties
         self.setGeometry(300, 300, 300, 200)
-        self.setWindowTitle('Select Songs')
+        self.setWindowTitle("Select Songs")
 
     def populate_song_list(self):
         # Populate the list widget with songs from the dictionary
-        for song, artist in self.songs.items():
+        for song in self.songs.items():
             # Create a custom QListWidgetItem
             item = QListWidgetItem(self.song_list_widget)
             self.song_list_widget.addItem(item)
 
             # Create a QCheckBox
-            checkbox = QCheckBox(f'{song} - {artist}')
+            title = song[1]["title"]
+            artists = ','.join(song[1]["artist"])
+            checkbox = QCheckBox(f"{title} - {artists}")
             checkbox.setChecked(False)  # Initially unchecked
             item.setSizeHint(checkbox.sizeHint())  # Set item size based on the checkbox
 
@@ -129,19 +191,17 @@ class SongApp(QWidget):
 
     def on_submit(self):
         # Modify the dictionary based on selected songs
-        selected_songs = {}
         for i in range(self.song_list_widget.count()):
             item = self.song_list_widget.item(i)
             checkbox = self.song_list_widget.itemWidget(item)
-            if checkbox.isChecked():
-                song_artist = checkbox.text().split(' - ')
-                selected_songs[song_artist[0]] = song_artist[1]
+            song_key = list(self.songs.keys())[i]
+            self.songs[song_key]["picked"] = checkbox.isChecked()
 
         # Print or use the modified dictionary
-        print('Selected Songs:', selected_songs)
+        print("Updated Songs:", self.songs)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     app = QApplication(sys.argv)
     form = SongApp()
     form.show()
