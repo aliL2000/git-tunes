@@ -1,12 +1,11 @@
-from authorization.spotify_auth import get_refresh_token, get_authorization_URL
+from authorization.spotify_auth import get_authorization_code, get_new_token
 from spotify_api.playlist_data import (
     get_playlist_by_id,
     get_songs_from_playlist,
     get_differences,
     add_to_playlist,
 )
-from authorization.user_authentication import obtain_spotify_authentication
-
+from authorization.user_authentication import obtain_spotify_redirect
 import os
 import json
 from PyQt6.QtWidgets import (
@@ -90,9 +89,9 @@ class SongApp(QWidget):
                 "picked": False,
             },
         }
-        self.token = obtain_spotify_authentication()
+        redirect_url = obtain_spotify_redirect()
+        self.token = get_new_token(get_authorization_code(redirect_url))
         if self.token:
-            print(self.token)
             self.initUI()
         else:
             print("There was a problem authenticating the application")

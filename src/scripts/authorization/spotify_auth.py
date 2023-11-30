@@ -12,7 +12,7 @@ client_id = os.getenv("CLIENT_ID")
 client_secret = os.getenv("CLIENT_SECRET")
 redirect_url = "https://localhost/"
 
-given_state = "".join(random.choice(string.ascii_letters) for i in range(16))
+given_state = None
 
 def get_refresh_token():
     token_url = "https://accounts.spotify.com/api/token"
@@ -43,10 +43,12 @@ def get_authorization_code(response_url):
     auth_code = response_params["https://localhost/?code"]
     returned_state = response_params["state"]
     if returned_state != given_state:
+        print("State Error")
         exit()
     return auth_code
 
 def get_authorization_URL():
+    global given_state
     given_state = "".join(random.choice(string.ascii_letters) for i in range(16))
     auth_params = {
         "client_id": client_id,

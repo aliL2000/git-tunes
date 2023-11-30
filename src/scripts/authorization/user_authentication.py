@@ -16,10 +16,10 @@ def check_for_url_change(driver, current_url):
             break  # Exit the loop when the URL changes
         time.sleep(1)  # Adjust the delay as needed
 
-def obtain_spotify_authentication():
-    token = get_refresh_token()
-    if token:
-        return token
+def obtain_spotify_redirect():
+    # token = get_refresh_token()
+    # if token:
+    #     return token
     global spotify_redirect_url
     
     url_to_monitor = get_authorization_URL()
@@ -36,6 +36,4 @@ def obtain_spotify_authentication():
     monitor_thread.join()
     driver.quit()
 
-
-
-    return get_new_token(get_authorization_code(spotify_redirect_url))
+    return spotify_redirect_url
