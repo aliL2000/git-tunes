@@ -18,9 +18,13 @@ from PyQt6.QtWidgets import (
     QGridLayout,
     QPushButton,
     QLineEdit,
-    QCheckBox,
+    QCheckBox
+
+
 )
+from PyQt6.QtWebEngineWidgets import QWebEngineView
 from PyQt6 import QtCore
+from PyQt6.QtCore import Qt, QUrl, QEventLoop
 import sys
 
 # This will check if a refresh token exists, and if it doesn't or there's an error, it'll get a new code.
@@ -87,12 +91,32 @@ import sys
 #     form.show()
 #     sys.exit(app.exec())
 
+class AuthWindow(QWidget):
+    def __init__(self, auth_url, parent=None):
+        super().__init__(parent)
+        self.result = None
+        self.web_view = QWebEngineView(self)
+        self.web_view.setUrl(QUrl(auth_url))
+
+        layout = QVBoxLayout(self)
+        layout.addWidget(self.web_view)
+
+    def wait_for_close(self):
+        loop = QEventLoop(self)
+        self.web_view.loadFinished.connect(loop.quit)
+        loop.exec()
+
+    def on_url_changed(self, qurl):
+        self.result = qurl.toString()
+        self.close()
+
 
 class SongApp(QWidget):
     def __init__(self):
         super().__init__()
 
         # Sample dictionary of songs
+        self.spotify_auth_url = "https://example.com/authenticate"
         self.songs = {
             "song1": {
                 "title": "End of Line",
@@ -149,8 +173,34 @@ class SongApp(QWidget):
                 "picked": False,
             },
         }
+        self.token = ""
+        if self.get_spotify_token():
+            self.initUI()
 
-        self.initUI()
+    def get_spotify_token(self):
+
+        auth_window = AuthWindow(self.spotify_auth_url, self)
+        auth_window.setGeometry(100, 100, 800, 600)
+        auth_window.show()
+
+        auth_window.wait_for_close()
+
+        # Extract the redirect URL from the authentication window
+        redirect_url = auth_window.result
+
+        redirect_url = "1"
+        # Handle the redirect URL as needed (e.g., extract the token)
+        if redirect_url:
+            print("Redirect URL:", redirect_url)
+            # Implement logic to extract token from the redirect_url
+            # For example, you might parse the URL to get the token.
+
+            # Simulate successful token retrieval
+            return True
+        else:
+            print("Authentication failed")
+            # Handle the case where authentication failed
+            return False
 
     def initUI(self):
         layout = QVBoxLayout()
