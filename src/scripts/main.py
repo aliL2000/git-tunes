@@ -1,10 +1,11 @@
-from authorization.spotify_auth import get_new_token, get_auth_code, get_refresh_token, get_authorization_URL
+from authorization.spotify_auth import get_refresh_token, get_authorization_URL
 from spotify_api.playlist_data import (
     get_playlist_by_id,
     get_songs_from_playlist,
     get_differences,
     add_to_playlist,
 )
+from authorization.user_authentication import obtain_spotify_authentication
 
 import os
 import json
@@ -28,15 +29,11 @@ from PyQt6.QtCore import Qt, QUrl, QEventLoop
 import sys
 
 
-
-
 class SongApp(QWidget):
     def __init__(self):
         super().__init__()
 
         # Sample dictionary of songs
-        self.spotify_auth_url = get_authorization_URL()
-        print(self.spotify_auth_url)
         self.songs = {
             "song1": {
                 "title": "End of Line",
@@ -93,34 +90,13 @@ class SongApp(QWidget):
                 "picked": False,
             },
         }
-        self.token = ""
-        if self.get_spotify_token():
+        self.token = obtain_spotify_authentication()
+        if self.token:
+            print(self.token)
             self.initUI()
-
-    def get_spotify_token(self):
-
-        auth_window = AuthWindow(self.spotify_auth_url, self)
-        auth_window.setGeometry(100, 100, 800, 600)
-        auth_window.show()
-
-        # Wait for the authentication window to be closed
-        auth_window.wait_for_close()
-
-        # Extract the redirect URL from the authentication window
-        redirect_url = auth_window.result
-
-        # Handle the redirect URL as needed (e.g., extract the token)
-        if redirect_url:
-            print("Redirect URL:", redirect_url)
-            # Implement logic to extract token from the redirect_url
-            # For example, you might parse the URL to get the token.
-
-            # Simulate successful token retrieval
-            return True
         else:
-            print("Authentication failed")
-            # Handle the case where authentication failed
-            return False
+            print("There was a problem authenticating the application")
+            exit()
 
     def initUI(self):
         layout = QVBoxLayout()
@@ -179,21 +155,21 @@ if __name__ == "__main__":
 
 
 #This will check if a refresh token exists, and if it doesn't or there's an error, it'll get a new code.
-token = get_refresh_token()
-print("hellooooo")
-json_first_playlist = get_playlist_by_id(token,"https://open.spotify.com/playlist/0tG8lWSuqMaZhJ1HkUyhCo?si=8bf6f26f84d6426a")
-json_second_playlist = get_playlist_by_id(token,"https://open.spotify.com/playlist/0CtD0CLuF8cXpLAN1H07jO?si=323512ab01b44220")
-first_playlist_songs = get_songs_from_playlist(json_first_playlist)
-second_playlist_songs = get_songs_from_playlist(json_second_playlist)
+# token = get_refresh_token()
+# print("hellooooo")
+# json_first_playlist = get_playlist_by_id(token,"https://open.spotify.com/playlist/0tG8lWSuqMaZhJ1HkUyhCo?si=8bf6f26f84d6426a")
+# json_second_playlist = get_playlist_by_id(token,"https://open.spotify.com/playlist/0CtD0CLuF8cXpLAN1H07jO?si=323512ab01b44220")
+# first_playlist_songs = get_songs_from_playlist(json_first_playlist)
+# second_playlist_songs = get_songs_from_playlist(json_second_playlist)
 
-different_songs = get_differences(first_playlist_songs,second_playlist_songs)
+# different_songs = get_differences(first_playlist_songs,second_playlist_songs)
 
-print(different_songs)
+# print(different_songs)
 
-test = json.dumps(different_songs)
-different_songs["song1"]["picked"] = True
+# test = json.dumps(different_songs)
+# different_songs["song1"]["picked"] = True
 
-add_to_playlist(token,"0CtD0CLuF8cXpLAN1H07jO",different_songs)
+# add_to_playlist(token,"0CtD0CLuF8cXpLAN1H07jO",different_songs)
 
 
 # https://realpython.com/pysimplegui-python/#packaging-your-pysimplegui-application-for-windows

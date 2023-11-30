@@ -12,6 +12,7 @@ client_id = os.getenv("CLIENT_ID")
 client_secret = os.getenv("CLIENT_SECRET")
 redirect_url = "https://localhost/"
 
+given_state = "".join(random.choice(string.ascii_letters) for i in range(16))
 
 def get_refresh_token():
     token_url = "https://accounts.spotify.com/api/token"
@@ -35,32 +36,15 @@ def get_refresh_token():
     token_data = json.loads(result.content)
     if result.status_code == 200:
         return token_data["access_token"]
-    else:
-        return get_new_token(get_auth_code())
+    return None
 
-def get_auth_code():
-    given_state = "".join(random.choice(string.ascii_letters) for i in range(16))
-    auth_params = {
-        "client_id": client_id,
-        "response_type": "code",
-        "redirect_uri": redirect_url,
-        "scope": "playlist-modify-private playlist-modify-public user-modify-playback-state",
-        "state": given_state,
-    }
-
-    auth_url = "https://accounts.spotify.com/authorize?" + urlencode(auth_params)
-    print(
-        f"Please navigate to this URL to authorize your application: {auth_url}"
-        + "\n--------"
-    )
-    response_url = input("Paste the URL you were redirected to here: ")
+def get_authorization_code(response_url):
     response_params = dict(pair.split("=") for pair in response_url.split("&"))
     auth_code = response_params["https://localhost/?code"]
     returned_state = response_params["state"]
     if returned_state != given_state:
         exit()
     return auth_code
-
 
 def get_authorization_URL():
     given_state = "".join(random.choice(string.ascii_letters) for i in range(16))
@@ -71,7 +55,6 @@ def get_authorization_URL():
         "scope": "playlist-modify-private playlist-modify-public user-modify-playback-state",
         "state": given_state,
     }
-
     return "https://accounts.spotify.com/authorize?" + urlencode(auth_params)
 
 def get_new_token(auth_code):
