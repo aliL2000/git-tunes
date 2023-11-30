@@ -17,9 +17,9 @@ def check_for_url_change(driver, current_url):
         time.sleep(1)  # Adjust the delay as needed
 
 def obtain_spotify_redirect():
-    # token = get_refresh_token()
-    # if token:
-    #     return token
+    token = get_refresh_token()
+    if token:
+        return token
     global spotify_redirect_url
     
     url_to_monitor = get_authorization_URL()
