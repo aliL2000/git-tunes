@@ -1,4 +1,4 @@
-from authorization.spotify_auth import get_new_token, get_auth_code, get_refresh_token
+from authorization.spotify_auth import get_new_token, get_auth_code, get_refresh_token, get_authorization_URL
 from spotify_api.playlist_data import (
     get_playlist_by_id,
     get_songs_from_playlist,
@@ -27,88 +27,7 @@ from PyQt6 import QtCore
 from PyQt6.QtCore import Qt, QUrl, QEventLoop
 import sys
 
-# This will check if a refresh token exists, and if it doesn't or there's an error, it'll get a new code.
-# token = get_refresh_token()
-# print("hellooooo")
-# json_first_playlist = get_playlist_by_id(token,"https://open.spotify.com/playlist/0tG8lWSuqMaZhJ1HkUyhCo?si=8bf6f26f84d6426a")
-# json_second_playlist = get_playlist_by_id(token,"https://open.spotify.com/playlist/0CtD0CLuF8cXpLAN1H07jO?si=323512ab01b44220")
-# first_playlist_songs = get_songs_from_playlist(json_first_playlist)
-# second_playlist_songs = get_songs_from_playlist(json_second_playlist)
 
-# different_songs = get_differences(first_playlist_songs,second_playlist_songs)
-
-# print(different_songs)
-
-# test = json.dumps(different_songs)
-# different_songs["song1"]["picked"] = True
-
-# add_to_playlist(token,"0CtD0CLuF8cXpLAN1H07jO",different_songs)
-
-
-# https://realpython.com/pysimplegui-python/#packaging-your-pysimplegui-application-for-windows
-
-
-# class MyForm(QWidget):
-#     def __init__(self):
-#         super().__init__()
-#         self.initUI()
-
-#     def initUI(self):
-#         layout = QGridLayout()
-
-#         self.playlist_to_copy = QLineEdit()
-#         self.playlist_to_copy.setPlaceholderText("Playlist to copy from")
-#         self.playlist_to_be_copied = QLineEdit()
-#         self.playlist_to_be_copied.setPlaceholderText("Playlist to copy to")
-
-#         layout.addWidget(QLabel("Playlist #1"),0,0)
-#         layout.addWidget(self.playlist_to_copy, 1, 0)
-#         layout.addWidget(QLabel("Playlist #2"),2,0)
-#         layout.addWidget(self.playlist_to_be_copied, 3, 0)
-
-#         submit_button = QPushButton('Submit', self)
-#         submit_button.clicked.connect(self.on_submit)
-#         layout.addWidget(submit_button,4,0)
-
-#         self.setLayout(layout)
-
-#         self.setGeometry(300, 300, 300, 200)
-#         self.setWindowTitle('Submit Text Boxes')
-
-#     def on_submit(self):
-#         playlist_to_copy_URL = self.playlist_to_copy.text()
-#         playlist_to_be_copied_URL = self.playlist_to_be_copied.text()
-
-#         json_first_playlist = get_playlist_by_id(token,playlist_to_copy_URL)
-#         json_second_playlist = get_playlist_by_id(token,playlist_to_be_copied_URL)
-
-#         if
-
-
-# if __name__ == '__main__':
-#     app = QApplication(sys.argv)
-#     form = MyForm()
-#     form.show()
-#     sys.exit(app.exec())
-
-class AuthWindow(QWidget):
-    def __init__(self, auth_url, parent=None):
-        super().__init__(parent)
-        self.result = None
-        self.web_view = QWebEngineView(self)
-        self.web_view.setUrl(QUrl(auth_url))
-
-        layout = QVBoxLayout(self)
-        layout.addWidget(self.web_view)
-
-    def wait_for_close(self):
-        loop = QEventLoop(self)
-        self.web_view.loadFinished.connect(loop.quit)
-        loop.exec()
-
-    def on_url_changed(self, qurl):
-        self.result = qurl.toString()
-        self.close()
 
 
 class SongApp(QWidget):
@@ -116,7 +35,8 @@ class SongApp(QWidget):
         super().__init__()
 
         # Sample dictionary of songs
-        self.spotify_auth_url = "https://example.com/authenticate"
+        self.spotify_auth_url = get_authorization_URL()
+        print(self.spotify_auth_url)
         self.songs = {
             "song1": {
                 "title": "End of Line",
@@ -183,12 +103,12 @@ class SongApp(QWidget):
         auth_window.setGeometry(100, 100, 800, 600)
         auth_window.show()
 
+        # Wait for the authentication window to be closed
         auth_window.wait_for_close()
 
         # Extract the redirect URL from the authentication window
         redirect_url = auth_window.result
 
-        redirect_url = "1"
         # Handle the redirect URL as needed (e.g., extract the token)
         if redirect_url:
             print("Redirect URL:", redirect_url)
@@ -256,3 +176,68 @@ if __name__ == "__main__":
     form = SongApp()
     form.show()
     sys.exit(app.exec())
+
+
+#This will check if a refresh token exists, and if it doesn't or there's an error, it'll get a new code.
+token = get_refresh_token()
+print("hellooooo")
+json_first_playlist = get_playlist_by_id(token,"https://open.spotify.com/playlist/0tG8lWSuqMaZhJ1HkUyhCo?si=8bf6f26f84d6426a")
+json_second_playlist = get_playlist_by_id(token,"https://open.spotify.com/playlist/0CtD0CLuF8cXpLAN1H07jO?si=323512ab01b44220")
+first_playlist_songs = get_songs_from_playlist(json_first_playlist)
+second_playlist_songs = get_songs_from_playlist(json_second_playlist)
+
+different_songs = get_differences(first_playlist_songs,second_playlist_songs)
+
+print(different_songs)
+
+test = json.dumps(different_songs)
+different_songs["song1"]["picked"] = True
+
+add_to_playlist(token,"0CtD0CLuF8cXpLAN1H07jO",different_songs)
+
+
+# https://realpython.com/pysimplegui-python/#packaging-your-pysimplegui-application-for-windows
+
+
+# class MyForm(QWidget):
+#     def __init__(self):
+#         super().__init__()
+#         self.initUI()
+
+#     def initUI(self):
+#         layout = QGridLayout()
+
+#         self.playlist_to_copy = QLineEdit()
+#         self.playlist_to_copy.setPlaceholderText("Playlist to copy from")
+#         self.playlist_to_be_copied = QLineEdit()
+#         self.playlist_to_be_copied.setPlaceholderText("Playlist to copy to")
+
+#         layout.addWidget(QLabel("Playlist #1"),0,0)
+#         layout.addWidget(self.playlist_to_copy, 1, 0)
+#         layout.addWidget(QLabel("Playlist #2"),2,0)
+#         layout.addWidget(self.playlist_to_be_copied, 3, 0)
+
+#         submit_button = QPushButton('Submit', self)
+#         submit_button.clicked.connect(self.on_submit)
+#         layout.addWidget(submit_button,4,0)
+
+#         self.setLayout(layout)
+
+#         self.setGeometry(300, 300, 300, 200)
+#         self.setWindowTitle('Submit Text Boxes')
+
+#     def on_submit(self):
+#         playlist_to_copy_URL = self.playlist_to_copy.text()
+#         playlist_to_be_copied_URL = self.playlist_to_be_copied.text()
+
+#         json_first_playlist = get_playlist_by_id(token,playlist_to_copy_URL)
+#         json_second_playlist = get_playlist_by_id(token,playlist_to_be_copied_URL)
+
+#         if
+
+
+# if __name__ == '__main__':
+#     app = QApplication(sys.argv)
+#     form = MyForm()
+#     form.show()
+#     sys.exit(app.exec())

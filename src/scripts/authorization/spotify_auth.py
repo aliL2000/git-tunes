@@ -62,6 +62,18 @@ def get_auth_code():
     return auth_code
 
 
+def get_authorization_URL():
+    given_state = "".join(random.choice(string.ascii_letters) for i in range(16))
+    auth_params = {
+        "client_id": client_id,
+        "response_type": "code",
+        "redirect_uri": redirect_url,
+        "scope": "playlist-modify-private playlist-modify-public user-modify-playback-state",
+        "state": given_state,
+    }
+
+    return "https://accounts.spotify.com/authorize?" + urlencode(auth_params)
+
 def get_new_token(auth_code):
     token_url = "https://accounts.spotify.com/api/token"
     token_params = {
