@@ -90,7 +90,10 @@ class SongApp(QWidget):
             },
         }
         redirect_url = obtain_spotify_redirect()
-        self.token = get_new_token(get_authorization_code(redirect_url))
+        if "https://localhost/?code" in redirect_url:
+            self.token = get_new_token(get_authorization_code(redirect_url))
+        else:
+            self.token = redirect_url
         if self.token:
             self.initUI()
         else:

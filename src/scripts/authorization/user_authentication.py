@@ -21,7 +21,6 @@ def obtain_spotify_redirect():
     if token:
         return token
     global spotify_redirect_url
-    
     url_to_monitor = get_authorization_URL()
     # Set up the WebDriver (in this example, using Chrome)
     driver = webdriver.Chrome()
