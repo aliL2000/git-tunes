@@ -9,7 +9,6 @@ from authorization.user_authentication import obtain_spotify_redirect
 import os
 import json
 from PyQt6.QtWidgets import (
-    QVBoxLayout,
     QListWidget,
     QListWidgetItem,
     QApplication,
@@ -18,13 +17,8 @@ from PyQt6.QtWidgets import (
     QGridLayout,
     QPushButton,
     QLineEdit,
-    QCheckBox
-
-
+    QCheckBox,
 )
-from PyQt6.QtWebEngineWidgets import QWebEngineView
-from PyQt6 import QtCore
-from PyQt6.QtCore import Qt, QUrl, QEventLoop
 import sys
 
 
@@ -101,16 +95,30 @@ class SongApp(QWidget):
             exit()
 
     def initUI(self):
-        layout = QVBoxLayout()
+        layout = QGridLayout()
 
         # Create list widget to display songs
+        self.playlist_to_copy = QLineEdit()
+        self.playlist_to_copy.setPlaceholderText("Playlist to copy from")
+        self.playlist_to_be_copied = QLineEdit()
+        self.playlist_to_be_copied.setPlaceholderText("Playlist to copy to")
+
+        layout.addWidget(QLabel("Playlist #1"))
+        layout.addWidget(self.playlist_to_copy)
+        layout.addWidget(QLabel("Playlist #2"))
+        layout.addWidget(self.playlist_to_be_copied)
+
+        submit_button = QPushButton("Submit Playlists", self)
+        submit_button.clicked.connect(self.on_submit_playlists)
+        layout.addWidget(submit_button)
+
         self.song_list_widget = QListWidget(self)
-        self.populate_song_list()
+        # self.populate_song_list()
         layout.addWidget(self.song_list_widget)
 
         # Create submit button
-        submit_button = QPushButton("Submit", self)
-        submit_button.clicked.connect(self.on_submit)
+        submit_button = QPushButton("Submit Songs", self)
+        submit_button.clicked.connect(self.on_submit_playlist_differences)
         layout.addWidget(submit_button)
 
         # Set the layout
@@ -119,6 +127,16 @@ class SongApp(QWidget):
         # Set window properties
         self.setGeometry(300, 300, 300, 200)
         self.setWindowTitle("Select Songs")
+
+    def on_submit_playlists(self):
+        playlist_to_copy_URL = self.playlist_to_copy.text()
+        playlist_to_be_copied_URL = self.playlist_to_be_copied.text()
+
+        json_first_playlist = get_playlist_by_id(self.token,playlist_to_copy_URL)
+        json_second_playlist = get_playlist_by_id(self.token,playlist_to_be_copied_URL)
+        
+        playlist_differences = get_differences(get_songs_from_playlist(json_first_playlist),get_songs_from_playlist(json_second_playlist))
+        print(playlist_differences)
 
     def populate_song_list(self):
         # Populate the list widget with songs from the dictionary
@@ -129,7 +147,7 @@ class SongApp(QWidget):
 
             # Create a QCheckBox
             title = song[1]["title"]
-            artists = ','.join(song[1]["artist"])
+            artists = ",".join(song[1]["artist"])
             checkbox = QCheckBox(f"{title} - {artists}")
             checkbox.setChecked(False)  # Initially unchecked
             item.setSizeHint(checkbox.sizeHint())  # Set item size based on the checkbox
@@ -137,7 +155,7 @@ class SongApp(QWidget):
             # Set the custom widget as the item widget
             self.song_list_widget.setItemWidget(item, checkbox)
 
-    def on_submit(self):
+    def on_submit_playlist_differences(self):
         # Modify the dictionary based on selected songs
         for i in range(self.song_list_widget.count()):
             item = self.song_list_widget.item(i)
@@ -156,7 +174,7 @@ if __name__ == "__main__":
     sys.exit(app.exec())
 
 
-#This will check if a refresh token exists, and if it doesn't or there's an error, it'll get a new code.
+# This will check if a refresh token exists, and if it doesn't or there's an error, it'll get a new code.
 # token = get_refresh_token()
 # print("hellooooo")
 # json_first_playlist = get_playlist_by_id(token,"https://open.spotify.com/playlist/0tG8lWSuqMaZhJ1HkUyhCo?si=8bf6f26f84d6426a")
@@ -177,33 +195,6 @@ if __name__ == "__main__":
 # https://realpython.com/pysimplegui-python/#packaging-your-pysimplegui-application-for-windows
 
 
-# class MyForm(QWidget):
-#     def __init__(self):
-#         super().__init__()
-#         self.initUI()
-
-#     def initUI(self):
-#         layout = QGridLayout()
-
-#         self.playlist_to_copy = QLineEdit()
-#         self.playlist_to_copy.setPlaceholderText("Playlist to copy from")
-#         self.playlist_to_be_copied = QLineEdit()
-#         self.playlist_to_be_copied.setPlaceholderText("Playlist to copy to")
-
-#         layout.addWidget(QLabel("Playlist #1"),0,0)
-#         layout.addWidget(self.playlist_to_copy, 1, 0)
-#         layout.addWidget(QLabel("Playlist #2"),2,0)
-#         layout.addWidget(self.playlist_to_be_copied, 3, 0)
-
-#         submit_button = QPushButton('Submit', self)
-#         submit_button.clicked.connect(self.on_submit)
-#         layout.addWidget(submit_button,4,0)
-
-#         self.setLayout(layout)
-
-#         self.setGeometry(300, 300, 300, 200)
-#         self.setWindowTitle('Submit Text Boxes')
-
 #     def on_submit(self):
 #         playlist_to_copy_URL = self.playlist_to_copy.text()
 #         playlist_to_be_copied_URL = self.playlist_to_be_copied.text()
@@ -212,10 +203,3 @@ if __name__ == "__main__":
 #         json_second_playlist = get_playlist_by_id(token,playlist_to_be_copied_URL)
 
 #         if
-
-
-# if __name__ == '__main__':
-#     app = QApplication(sys.argv)
-#     form = MyForm()
-#     form.show()
-#     sys.exit(app.exec())
