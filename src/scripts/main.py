@@ -1,3 +1,4 @@
+
 from authorization.spotify_auth import get_authorization_code, get_new_token
 from spotify_api.playlist_data import (
     get_playlist_by_id,
@@ -19,6 +20,7 @@ from PyQt6.QtWidgets import (
     QPushButton,
     QLineEdit,
     QCheckBox,
+    QMessageBox
 )
 import sys
 
@@ -28,62 +30,7 @@ class SongApp(QWidget):
         super().__init__()
 
         # Sample dictionary of songs
-        self.songs = {
-            "song1": {
-                "title": "End of Line",
-                "artist": ["Daft Punk"],
-                "URI": "spotify:track:09TlxralXOGX35LUutvw7I",
-                "picked": False,
-            },
-            "song2": {
-                "title": "Una Mattina",
-                "artist": ["Ludovico Einaudi"],
-                "URI": "spotify:track:0Dkibk70FDp6t7eOZNemNQ",
-                "picked": False,
-            },
-            "song3": {
-                "title": "TURN IT UP",
-                "artist": ["Cochise"],
-                "URI": "spotify:track:0uUljDsi9o1MXjReM6uLzz",
-                "picked": False,
-            },
-            "song4": {
-                "title": "Can You Hear The Music",
-                "artist": ["Ludwig Göransson"],
-                "URI": "spotify:track:4VnDmjYCZkyeqeb0NIKqdA",
-                "picked": False,
-            },
-            "song5": {
-                "title": "Luminary",
-                "artist": ["Joel Sunny"],
-                "URI": "spotify:track:66pWxtaxTV8CxcGOvivZeT",
-                "picked": False,
-            },
-            "song6": {
-                "title": "The Streak",
-                "artist": ["Mychael Danna"],
-                "URI": "spotify:track:0vNY5T9ovcOxqA8B6QOATk",
-                "picked": False,
-            },
-            "song7": {
-                "title": "Like a Tattoo",
-                "artist": ["Sade"],
-                "URI": "spotify:track:4PEGwWH4tL6H7dGl4uVSPg",
-                "picked": False,
-            },
-            "song8": {
-                "title": "King of Curses, Fire Arrow",
-                "artist": ["James Liam Figueroa"],
-                "URI": "spotify:track:5Mm6Nr9uzhQVOnsw0HDQqH",
-                "picked": False,
-            },
-            "song9": {
-                "title": "Cornfield Chase",
-                "artist": ["Hans Zimmer"],
-                "URI": "spotify:track:6pWgRkpqVfxnj3WuIcJ7WP",
-                "picked": False,
-            },
-        }
+        self.songs = {}
         self.token = obtain_spotify_redirect()
         if "https://localhost/?code" in self.token:
             self.token = get_new_token(get_authorization_code(self.token))
@@ -170,8 +117,45 @@ class SongApp(QWidget):
 
         # Print or use the modified dictionary
         print("Updated Songs:", self.songs)
-        add_to_playlist(self.token,get_playlist_id(self.playlist_to_be_copied.text),self.songs)
+        result_status = add_to_playlist(self.token,get_playlist_id(self.playlist_to_be_copied.text),self.songs) 
+        self.show_popup(result_status)
+    
+    def show_popup(self, result_status_code):
+        message_box = QMessageBox()
 
+        if result_status_code == 200:
+            message_box.setIcon(QMessageBox.Icon.Information)
+            message_box.setText("Songs added successfully!")
+            combine_another_button = message_box.addButton("Combine another set of playlists", QMessageBox.ButtonRole.ActionRole)
+            combine_another_button.clicked.connect(self.combine_another_playlists)
+        elif result_status_code == 429:
+            message_box.setIcon(QMessageBox.Icon.Warning)
+            message_box.setText("App Error\nContact Developer on Git Page")
+        else:
+            message_box.setIcon(QMessageBox.Icon.Warning)
+            message_box.setText("Spotify Error\nPlease retry.")
+            combine_same_button = message_box.addButton("Retry", QMessageBox.ButtonRole.ActionRole)
+            combine_same_button.clicked.connect(self.retry_adding)
+
+        close_button = message_box.addButton("Close", QMessageBox.ButtonRole.AcceptRole)
+        close_button.clicked.connect(self.close_application)
+
+        message_box.setWindowTitle("Status")
+        message_box.exec()
+
+    def retry_adding(self):
+        result_status = add_to_playlist(self.token,get_playlist_id(self.playlist_to_be_copied.text),self.songs) 
+        self.show_popup(result_status)
+
+    def close_application(self):
+        sys.exit(app.exec())
+
+    def combine_another_playlists(self):
+        # Implement logic to reset fields and perform any other necessary actions
+        print("Combine another set of playlists clicked")
+        self.playlist_to_copy.clear()
+        self.playlist_to_be_copied.clear()
+        self.songs.clear()
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)

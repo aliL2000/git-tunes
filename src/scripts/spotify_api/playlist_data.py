@@ -62,6 +62,7 @@ def get_differences(playlist1, playlist2):
 
 
 def add_to_playlist(token, playlist_ID_to_add_to, picked_songs_dictionary):
+
     filtered_keys = {
         key: value
         for key, value in picked_songs_dictionary.items()
@@ -79,6 +80,4 @@ def add_to_playlist(token, playlist_ID_to_add_to, picked_songs_dictionary):
     }
     data = {"uris": URI_of_songs_to_add}
     result = post(url, headers=headers, data=json.dumps(data))
-    json_result = json.loads(result.content)
-    print(json_result)
-    return
+    return result.status_code
