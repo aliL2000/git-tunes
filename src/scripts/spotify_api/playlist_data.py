@@ -58,6 +58,7 @@ def get_differences(playlist1, playlist2):
         for key, value in playlist1.items()
         if value["title"] not in common_titles
     }
+    
     return dict1
 
 

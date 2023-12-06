@@ -71,19 +71,20 @@ class SongApp(QWidget):
         self.setLayout(layout)
 
         # Set window properties
-        self.setGeometry(300, 300, 300, 200)
-        self.setWindowTitle("Select Songs")
+        self.setGeometry(300, 300, 700, 500)
+        self.setWindowTitle("Git-Tunes")
 
     def on_submit_playlists(self):
         playlist_to_copy_URL = self.playlist_to_copy.text()
         playlist_to_be_copied_URL = self.playlist_to_be_copied.text()
 
         playlist_to_copy_ID = get_playlist_id(playlist_to_copy_URL)
-        playlist_to_copy_ID = get_playlist_id(playlist_to_be_copied_URL)
+        playlist_to_copied_ID = get_playlist_id(playlist_to_be_copied_URL)
 
         json_first_playlist = get_playlist_by_id(self.token,playlist_to_copy_ID)
-        json_second_playlist = get_playlist_by_id(self.token,playlist_to_copy_ID)
+        json_second_playlist = get_playlist_by_id(self.token,playlist_to_copied_ID)
         
+
         if "error" in json_first_playlist or "error" in json_second_playlist:
             print("Looks like we could not find the playlist you had in mind, re-try the link")
         else:
@@ -91,7 +92,6 @@ class SongApp(QWidget):
             self.populate_song_list()
 
     def populate_song_list(self):
-        # Populate the list widget with songs from the dictionary
         for song in self.songs.items():
             # Create a custom QListWidgetItem
             item = QListWidgetItem(self.song_list_widget)
@@ -101,7 +101,7 @@ class SongApp(QWidget):
             title = song[1]["title"]
             artists = ",".join(song[1]["artist"])
             checkbox = QCheckBox(f"{title} - {artists}")
-            checkbox.setChecked(False)  # Initially unchecked
+            checkbox.setChecked(False)
             item.setSizeHint(checkbox.sizeHint())  # Set item size based on the checkbox
 
             # Set the custom widget as the item widget
@@ -117,13 +117,13 @@ class SongApp(QWidget):
 
         # Print or use the modified dictionary
         print("Updated Songs:", self.songs)
-        result_status = add_to_playlist(self.token,get_playlist_id(self.playlist_to_be_copied.text),self.songs) 
+        result_status = add_to_playlist(self.token,get_playlist_id(self.playlist_to_be_copied.text()),self.songs) 
         self.show_popup(result_status)
     
     def show_popup(self, result_status_code):
         message_box = QMessageBox()
 
-        if result_status_code == 200:
+        if result_status_code == 201:
             message_box.setIcon(QMessageBox.Icon.Information)
             message_box.setText("Songs added successfully!")
             combine_another_button = message_box.addButton("Combine another set of playlists", QMessageBox.ButtonRole.ActionRole)
@@ -156,6 +156,7 @@ class SongApp(QWidget):
         self.playlist_to_copy.clear()
         self.playlist_to_be_copied.clear()
         self.songs.clear()
+        self.populate_song_list()
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
