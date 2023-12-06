@@ -4,6 +4,7 @@ from spotify_api.playlist_data import (
     get_songs_from_playlist,
     get_differences,
     add_to_playlist,
+    get_playlist_id
 )
 from authorization.user_authentication import obtain_spotify_redirect
 import os
@@ -83,11 +84,9 @@ class SongApp(QWidget):
                 "picked": False,
             },
         }
-        redirect_url = obtain_spotify_redirect()
-        if "https://localhost/?code" in redirect_url:
-            self.token = get_new_token(get_authorization_code(redirect_url))
-        else:
-            self.token = redirect_url
+        self.token = obtain_spotify_redirect()
+        if "https://localhost/?code" in self.token:
+            self.token = get_new_token(get_authorization_code(self.token))
         if self.token:
             self.initUI()
         else:
@@ -132,11 +131,17 @@ class SongApp(QWidget):
         playlist_to_copy_URL = self.playlist_to_copy.text()
         playlist_to_be_copied_URL = self.playlist_to_be_copied.text()
 
-        json_first_playlist = get_playlist_by_id(self.token,playlist_to_copy_URL)
-        json_second_playlist = get_playlist_by_id(self.token,playlist_to_be_copied_URL)
+        playlist_to_copy_ID = get_playlist_id(playlist_to_copy_URL)
+        playlist_to_copy_ID = get_playlist_id(playlist_to_be_copied_URL)
+
+        json_first_playlist = get_playlist_by_id(self.token,playlist_to_copy_ID)
+        json_second_playlist = get_playlist_by_id(self.token,playlist_to_copy_ID)
         
-        playlist_differences = get_differences(get_songs_from_playlist(json_first_playlist),get_songs_from_playlist(json_second_playlist))
-        print(playlist_differences)
+        if "error" in json_first_playlist or "error" in json_second_playlist:
+            print("Looks like we could not find the playlist you had in mind, re-try the link")
+        else:
+            self.songs = get_differences(get_songs_from_playlist(json_first_playlist),get_songs_from_playlist(json_second_playlist))
+            self.populate_song_list()
 
     def populate_song_list(self):
         # Populate the list widget with songs from the dictionary
@@ -165,6 +170,7 @@ class SongApp(QWidget):
 
         # Print or use the modified dictionary
         print("Updated Songs:", self.songs)
+        add_to_playlist(self.token,get_playlist_id(self.playlist_to_be_copied.text),self.songs)
 
 
 if __name__ == "__main__":
@@ -193,13 +199,3 @@ if __name__ == "__main__":
 
 
 # https://realpython.com/pysimplegui-python/#packaging-your-pysimplegui-application-for-windows
-
-
-#     def on_submit(self):
-#         playlist_to_copy_URL = self.playlist_to_copy.text()
-#         playlist_to_be_copied_URL = self.playlist_to_be_copied.text()
-
-#         json_first_playlist = get_playlist_by_id(token,playlist_to_copy_URL)
-#         json_second_playlist = get_playlist_by_id(token,playlist_to_be_copied_URL)
-
-#         if

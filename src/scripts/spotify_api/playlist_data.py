@@ -3,18 +3,21 @@ from requests import post, get
 import json
 import re
 
-
-def get_playlist_by_id(token, playlist):
-    match = re.search(r"playlist/([^?]+)", playlist)
+def get_playlist_id(playlist_url):
+    match = re.search(r"playlist/([^?]+)", playlist_url)
     playlist_id = ""
     if match:
         playlist_id = match.group(1)
+    return playlist_id
+
+def get_playlist_by_id(token, playlist_id):
+
     url = f"https://api.spotify.com/v1/playlists/{playlist_id}"
     headers = get_auth_header(token)
 
     result = get(url, headers=headers)
-    json_result = json.loads(result.content)
     if result.status_code == 200:
+        json_result = json.loads(result.content)
         return json_result
     elif result.status_code == 404:
         return {"error": "Not found Playlist"}

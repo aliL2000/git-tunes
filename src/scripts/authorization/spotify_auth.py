@@ -79,7 +79,7 @@ def get_new_token(auth_code):
             file.write(f"refresh_token={refresh_token}\n")
         return token_data["access_token"]
     else:
-        print("ruh roh")
+        print("There was a problem getting your access token and setting your refresh token")
         exit()
 
 
