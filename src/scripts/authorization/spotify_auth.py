@@ -21,8 +21,6 @@ def get_refresh_token():
         for line in my_file:
             lines.append(line)
     refresh_token = lines[0].split("=")[1].replace("\n", "")
-    auth_code = lines[1].split("=")[1].replace("\n", "")
-    #
     token_headers = {
         "Authorization": "Basic " + get_auth_encoded_string(),
         "Content-Type": "application/x-www-form-urlencoded"
