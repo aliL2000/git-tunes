@@ -1,15 +1,12 @@
-
 from authorization.spotify_auth import get_authorization_code, get_new_token
 from spotify_api.playlist_data import (
     get_playlist_by_id,
     get_songs_from_playlist,
     get_differences,
     add_to_playlist,
-    get_playlist_id
+    get_playlist_id,
 )
 from authorization.user_authentication import obtain_spotify_redirect
-import os
-import json
 from PyQt6.QtWidgets import (
     QListWidget,
     QListWidgetItem,
@@ -20,7 +17,7 @@ from PyQt6.QtWidgets import (
     QPushButton,
     QLineEdit,
     QCheckBox,
-    QMessageBox
+    QMessageBox,
 )
 import sys
 
@@ -81,14 +78,18 @@ class SongApp(QWidget):
         playlist_to_copy_ID = get_playlist_id(playlist_to_copy_URL)
         playlist_to_copied_ID = get_playlist_id(playlist_to_be_copied_URL)
 
-        json_first_playlist = get_playlist_by_id(self.token,playlist_to_copy_ID)
-        json_second_playlist = get_playlist_by_id(self.token,playlist_to_copied_ID)
-        
+        json_first_playlist = get_playlist_by_id(self.token, playlist_to_copy_ID)
+        json_second_playlist = get_playlist_by_id(self.token, playlist_to_copied_ID)
 
         if "error" in json_first_playlist or "error" in json_second_playlist:
-            print("Looks like we could not find the playlist you had in mind, re-try the link")
+            print(
+                "Looks like we could not find the playlist you had in mind, re-try the link"
+            )
         else:
-            self.songs = get_differences(get_songs_from_playlist(json_first_playlist),get_songs_from_playlist(json_second_playlist))
+            self.songs = get_differences(
+                get_songs_from_playlist(json_first_playlist),
+                get_songs_from_playlist(json_second_playlist),
+            )
             self.populate_song_list()
 
     def populate_song_list(self):
@@ -117,16 +118,20 @@ class SongApp(QWidget):
 
         # Print or use the modified dictionary
         print("Updated Songs:", self.songs)
-        result_status = add_to_playlist(self.token,get_playlist_id(self.playlist_to_be_copied.text()),self.songs) 
+        result_status = add_to_playlist(
+            self.token, get_playlist_id(self.playlist_to_be_copied.text()), self.songs
+        )
         self.show_popup(result_status)
-    
+
     def show_popup(self, result_status_code):
         message_box = QMessageBox()
 
         if result_status_code == 201:
             message_box.setIcon(QMessageBox.Icon.Information)
             message_box.setText("Songs added successfully!")
-            combine_another_button = message_box.addButton("Combine another set of playlists", QMessageBox.ButtonRole.ActionRole)
+            combine_another_button = message_box.addButton(
+                "Combine another set of playlists", QMessageBox.ButtonRole.ActionRole
+            )
             combine_another_button.clicked.connect(self.combine_another_playlists)
         elif result_status_code == 429:
             message_box.setIcon(QMessageBox.Icon.Warning)
@@ -134,7 +139,9 @@ class SongApp(QWidget):
         else:
             message_box.setIcon(QMessageBox.Icon.Warning)
             message_box.setText("Spotify Error\nPlease retry.")
-            combine_same_button = message_box.addButton("Retry", QMessageBox.ButtonRole.ActionRole)
+            combine_same_button = message_box.addButton(
+                "Retry", QMessageBox.ButtonRole.ActionRole
+            )
             combine_same_button.clicked.connect(self.retry_adding)
 
         close_button = message_box.addButton("Close", QMessageBox.ButtonRole.AcceptRole)
@@ -144,7 +151,9 @@ class SongApp(QWidget):
         message_box.exec()
 
     def retry_adding(self):
-        result_status = add_to_playlist(self.token,get_playlist_id(self.playlist_to_be_copied.text),self.songs) 
+        result_status = add_to_playlist(
+            self.token, get_playlist_id(self.playlist_to_be_copied.text), self.songs
+        )
         self.show_popup(result_status)
 
     def close_application(self):
@@ -158,29 +167,12 @@ class SongApp(QWidget):
         self.songs.clear()
         self.populate_song_list()
 
+
 if __name__ == "__main__":
     app = QApplication(sys.argv)
     form = SongApp()
     form.show()
     sys.exit(app.exec())
-
-
-# This will check if a refresh token exists, and if it doesn't or there's an error, it'll get a new code.
-# token = get_refresh_token()
-# print("hellooooo")
-# json_first_playlist = get_playlist_by_id(token,"https://open.spotify.com/playlist/0tG8lWSuqMaZhJ1HkUyhCo?si=8bf6f26f84d6426a")
-# json_second_playlist = get_playlist_by_id(token,"https://open.spotify.com/playlist/0CtD0CLuF8cXpLAN1H07jO?si=323512ab01b44220")
-# first_playlist_songs = get_songs_from_playlist(json_first_playlist)
-# second_playlist_songs = get_songs_from_playlist(json_second_playlist)
-
-# different_songs = get_differences(first_playlist_songs,second_playlist_songs)
-
-# print(different_songs)
-
-# test = json.dumps(different_songs)
-# different_songs["song1"]["picked"] = True
-
-# add_to_playlist(token,"0CtD0CLuF8cXpLAN1H07jO",different_songs)
 
 
 # https://realpython.com/pysimplegui-python/#packaging-your-pysimplegui-application-for-windows

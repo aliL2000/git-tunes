@@ -1,7 +1,8 @@
-from authorization.spotify_auth import get_auth_header, get_new_token
+from authorization.spotify_auth import get_auth_header
 from requests import post, get
 import json
 import re
+
 
 def get_playlist_id(playlist_url):
     match = re.search(r"playlist/([^?]+)", playlist_url)
@@ -10,8 +11,8 @@ def get_playlist_id(playlist_url):
         playlist_id = match.group(1)
     return playlist_id
 
-def get_playlist_by_id(token, playlist_id):
 
+def get_playlist_by_id(token, playlist_id):
     url = f"https://api.spotify.com/v1/playlists/{playlist_id}"
     headers = get_auth_header(token)
 
@@ -58,12 +59,11 @@ def get_differences(playlist1, playlist2):
         for key, value in playlist1.items()
         if value["title"] not in common_titles
     }
-    
+
     return dict1
 
 
 def add_to_playlist(token, playlist_ID_to_add_to, picked_songs_dictionary):
-
     filtered_keys = {
         key: value
         for key, value in picked_songs_dictionary.items()

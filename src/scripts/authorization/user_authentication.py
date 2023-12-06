@@ -1,4 +1,4 @@
-from authorization.spotify_auth import get_authorization_URL, get_refresh_token, get_authorization_code, get_new_token
+from authorization.spotify_auth import get_authorization_URL, get_refresh_token
 import threading
 from selenium import webdriver
 import time
