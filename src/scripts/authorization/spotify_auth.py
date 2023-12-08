@@ -17,7 +17,7 @@ given_state = None
 def get_refresh_token():
     token_url = "https://accounts.spotify.com/api/token"
     lines = []
-    with open("src/assets/tokens.txt") as my_file:
+    with open("assets/tokens.txt") as my_file:
         for line in my_file:
             lines.append(line)
     refresh_token = lines[0].split("=")[1].replace("\n", "")
