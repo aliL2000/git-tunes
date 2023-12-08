@@ -11,7 +11,7 @@ I made this project as a sort of POC, and might explore this further? Depending 
 - [Contact Me](#contact-me)
 - [Future Development](#future-development)
 
-### Pre-requisites
+## Pre-requisites
 
 You'll need the following applications to be installed:
 
@@ -29,7 +29,7 @@ You'll need the following applications to be installed:
 
 **NOTE**: To use the Spotify API, you can either create your own Spotify application and get your own *client_id* and *client_secret* **OR** you can contact me (see below), to get my application credentials (I need to verify your usage of the program), then you can go the .env file located in the project and copy and paste the contents within the .txt file I send you.
 
-### Getting started
+## Getting started
 
 Clone the repository to your location of choice, using the following command.
 
@@ -52,12 +52,12 @@ then run this command to begin the program:
 python main.py
 ```
 
-### Contact Me
+## Contact Me
 
 My name is Ali, I can be reached on my personal email [here](mailto:aliladha2000@gmail.com).
 
 
-### Future Development
+## Future Development
 
 Some features, ordered in terms of personal priority:
 
