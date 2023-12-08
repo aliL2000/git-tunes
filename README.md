@@ -47,7 +47,7 @@ Then, navigate to the **/src** directory using this command:
 ```
 cd src
 ```
-then run this command to begin the program:
+Then, run this command to begin the program:
 ```
 python main.py
 ```
@@ -62,4 +62,4 @@ My name is Ali, I can be reached on my personal email [here](mailto:aliladha2000
 Some features, ordered in terms of personal priority:
 
 - Check all songs button, essentially over-riding the one-by-one selection of each song.
-- Create a .exe, thereby circum-navigating the manual authentication information exchange I have to do with any new user.
+- Create a .exe, thereby circumnavigating the manual authentication information exchange I have to do with any new user.
