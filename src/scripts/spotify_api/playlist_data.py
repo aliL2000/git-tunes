@@ -1,4 +1,4 @@
-from authorization.spotify_auth import get_auth_header
+from ..authorization.spotify_auth import get_auth_header
 from requests import post, get
 import json
 import re

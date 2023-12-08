@@ -1,12 +1,12 @@
-from authorization.spotify_auth import get_authorization_code, get_new_token
-from spotify_api.playlist_data import (
+from scripts.authorization.spotify_auth import get_authorization_code, get_new_token
+from scripts.spotify_api.playlist_data import (
     get_playlist_by_id,
     get_songs_from_playlist,
     get_differences,
     add_to_playlist,
     get_playlist_id,
 )
-from authorization.user_authentication import obtain_spotify_redirect
+from scripts.authorization.user_authentication import obtain_spotify_redirect
 from PyQt6.QtWidgets import (
     QListWidget,
     QListWidgetItem,
